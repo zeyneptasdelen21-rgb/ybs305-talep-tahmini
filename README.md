@@ -27,7 +27,11 @@ Günlük Armut hizmet kayıtları ile NovaPerakende ürün satışları arasınd
 
 ## Ekip çalışması
 
-Ekip üyelerinin sorumlulukları README’deki görev dağılımı bölümünde yer alır. Katkılar GitHub’da kişilerin kendi dallarında açtıkları Pull Request’ler ve commit’ler üzerinden takip edilir.
+Aidana Almas — Problem tanımı ve veriyi hazırlama.
+Zeynep Taşdelen — dbt dönüşümleri ve veri kontrolleri.
+Rümeysa Kocatürk — Dashboard.
+Mercan Taşlıtarla — İlişki analizi ve bulgular.
+Helin Oğur — Kurulum, GitHub ve ortak dokümantasyon.
 
 
 
