@@ -1,16 +1,16 @@
-# Tamamlayıcı İhtiyaç Tespiti ve Perakende Talep Tahmini
+# Armut Hizmet Talebi ve NovaPerakende Satışlarının Zaman Analizi ve Talep Tahmini
 
 **Ders:** YBS305 İş Zekâsı ve Veri Madenciliği · 2026–2027 Güz  
 **Ekip:** Aidana Almas, Zeynep Taşdelen, Rümeysa Kocatürk, Mercan Taşlıtarla, Helin Oğur  
-**Durum:** Başlangıç sürümü — kapsam ve veri kaynakları eğitmenle teyit edilmelidir.
+**Durum:** Yerel çalışan prototip — GitHub yayını ve hocanın ara teslim biçimine göre son paketleme bekliyor.
 
 ## 1. İş problemi
 
-Armut hizmet talep kayıtları ile NovaPerakende satışları arasında takvim zamanı düzeyinde keşifsel bir ilişki olup olmadığını inceliyoruz. İkinci hedef, geçmiş günlük perakende ürün adedinden kısa vadeli talep tahmini üretip stok planlamasına yönelik ölçülü öneriler hazırlamaktır.
+Armut hizmet talebi ve NovaPerakende ürün satışlarının zaman içindeki değişimini inceleyerek aralarındaki günlük ilişkiyi değerlendirmek; ayrıca perakende talebini tahmin ederek stok planlamasına yönelik öneriler geliştirmek.
 
-**Araştırma sorusu:** 2024'te günlük Armut hizmet kayıt sayısı ile aynı gündeki NovaPerakende ürün satış adedi birlikte değişiyor mu? Bu eşzamanlı hareket, basit takvim ve geçmiş satış özelliklerinin ötesinde talep tahminine katkı sağlıyor mu?
+**Araştırma soruları:** (1) 2024'te günlük Armut hizmet kayıt sayısı ile aynı gündeki NovaPerakende ürün satış adedi birlikte değişiyor mu? (2) Armut'un geçmiş günlük hizmet sayıları, takvim ve perakende satış geçmişinin ötesinde ürün talebi tahminine katkı sağlıyor mu? (3) NovaPerakende satış örüntüleri stok planlaması için hangi ölçülü önerileri destekliyor?
 
-> **Yorum sınırı:** Armut dosyasında şehir/bölge ve kategori adları yok; ortak müşteri anahtarı da bulunmuyor. Bu nedenle kayıtları müşteri veya kategori bazında birleştirmiyoruz. Bu proje yalnızca ulusal/takvim günü toplamlarını keşifsel biçimde karşılaştırır; ilişki bulgusu nedensellik veya tamamlayıcı ürün kanıtı değildir. Armut verisinin temsil ettiği coğrafya ve kaynağın kullanım koşulları eğitmenle doğrulanmalıdır.
+> **Yorum sınırı:** Armut dosyasında şehir/bölge ve kategori adları yok; ortak müşteri anahtarı da bulunmuyor. Bu nedenle kayıtları müşteri veya kategori bazında birleştirmiyoruz. İki kaynağı yalnızca günlük toplamlar üzerinden keşifsel olarak karşılaştırıyoruz. İlişki bulgusu nedensellik veya tamamlayıcı ürün kanıtı değildir; Armut özelliğinin tahmine katkısı ayrıca test edilir ve ilk testte iyileşme görülmemiştir. Armut verisinin temsil ettiği coğrafya ve kaynağın kullanım koşulları eğitmenle doğrulanmalıdır.
 
 ## 2. El kitabı ve teknoloji kararı
 

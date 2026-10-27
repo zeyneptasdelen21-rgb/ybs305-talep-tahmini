@@ -9,9 +9,9 @@ from model.train import evaluate_models, forecast_next_seven
 
 DATA = ROOT / "app" / "data" / "mart_daily_demand.csv"
 
-st.set_page_config(page_title="Tamamlayıcı İhtiyaç ve Talep", layout="wide")
-st.title("Tamamlayıcı İhtiyaç Tespiti ve Perakende Talep Tahmini")
-st.caption("Armut hizmet kayıtları ile NovaPerakende satışları 2024 takvim gününde keşifsel olarak karşılaştırılır. Bu eşleşme müşteri veya kategori eşleşmesi değildir.")
+st.set_page_config(page_title="Hizmet Talebi ve Perakende Talep Tahmini", layout="wide")
+st.title("Armut Hizmet Talebi ve NovaPerakende Satışlarının Zaman Analizi ve Talep Tahmini")
+st.caption("Armut hizmet talebi ile NovaPerakende ürün satışlarının günlük ilişkisini inceliyor, perakende talebini tahmin ederek stok planlamasına yönelik öneriler geliştiriyoruz. Kaynaklar müşteri veya kategori bazında eşleşmez.")
 if not DATA.exists():
     st.error("Mart CSV bulunamadı. Önce dbt modellerini çalıştırıp `scripts/export_marts.py` adımını tamamlayın.")
     st.stop()
