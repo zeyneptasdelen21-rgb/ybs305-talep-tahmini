@@ -1,45 +1,35 @@
-# İlk analiz özeti — 2024
+# 2024 Günlük İlişki Analizi
+
+Bu not, 13 Kasım’daki ilk teslim için Armut hizmet kayıtları ile NovaPerakende satışlarının günlük karşılaştırmasını özetler.
 
 ## Veri kapsamı
 
-- Armut: 2024'e ait 65.732 hizmet kaydı; gün toplamları üzerinden analiz edildi.
-- NovaPerakende: 2.000 kaynak satırı; 6.046 ürün birimi ve 7.206.829,00 TL net satış.
-- Tarihler: 1 Ocak–31 Aralık 2024; ortak günlük mart 366 gün.
-- Perakendede kaynakta satır olmayan 3 gün günlük seride sıfır satış olarak gösterildi.
+- Armut dosyasında 162.523 satır var; bunların 65.732’si 2024 yılına ait. Gün ve kategori koduna göre toplandığında 1.970 anonim satır oluştu.
+- NovaPerakende dosyasında 2024’e ait 2.000 satış satırı bulunuyor. Toplam 6.046 ürün birimi ve 7.206.829,00 TL net satış hesaplandı.
+- Karşılaştırma 1 Ocak–31 Aralık 2024 tarihlerini kapsayan 366 günlük takvim üzerinden yapıldı. Perakende dosyasında üç gün için satış satırı yoktu; bu günler seride sıfır olarak yer aldı.
+- Temizleme raporunda yinelenen veya geçersiz satır çıkarılmadı.
 
-## Hizmet talebi ile aynı gün perakende satışı
+## Aynı gün hizmet kaydı ve ürün satışı
 
-| Gösterge | Değer |
+| Ölçü | Sonuç |
 |---|---:|
-| Pearson günlük korelasyonu | 0,4028 |
-| Spearman günlük korelasyonu | 0,3981 |
-| Günlük ortalama Armut kayıt sayısı | 179,596 |
-| Günlük ortalama perakende ürün adedi | 16,519 |
+| Pearson korelasyonu | 0,4028 |
+| Spearman korelasyonu | 0,3981 |
+| Günlük ortalama Armut kaydı | 179,596 |
+| Günlük ortalama satılan ürün | 16,519 |
 
-Bu değerler 2024 günlük toplamlarında orta düzeyde pozitif eşzamanlı hareket gösteriyor. Ancak iki veri kaynağı ortak müşteri, şehir/bölge veya kategori anahtarı taşımıyor. Aynı gün korelasyonu; mevsim, haftanın günü, kaynak kapsamı ve ortak zaman örüntülerinden kaynaklanabilir. Bu nedenle sonuç nedensellik veya ürünlerin tamamlayıcı olduğuna dair kanıt değildir.
+İki katsayı da 2024 günlük toplamlarında orta düzeyde pozitif eşzamanlı hareket olduğunu gösteriyor. Hesaplama yalnızca aynı günün toplamlarını karşılaştırıyor; mevsim, haftanın günü, genel zaman eğilimi ve günlük gözlemlerin birbirine bağlı olması ayrıca kontrol edilmedi.
 
-## Tahmin deneyi
+Kaynaklarda ortak müşteri, şehir/bölge veya kategori anahtarı yok. Bu yüzden sonuç, hizmet talebinin ürün satışına yol açtığını ya da iki ürün grubunun tamamlayıcı olduğunu göstermez. Bulguyu keşifsel bir ilişki olarak yorumluyoruz.
 
-Günlük ürün adedi hedefi, kronolojik olarak eğitim (%80) ve son test dönemi (%20) olarak ayrıldı. Bu ilk karşılaştırma bir gün sonrası tahmin içindir; 7 günlük uygulama tahmini son modelle yinelemeli üretilir.
+## Dashboard için satış görünümü
 
-| Model | MAE (adet) | RMSE (adet) | WAPE |
-|---|---:|---:|---:|
-| HistGradientBoosting, perakende geçmişi | 9,872 | 13,560 | 38,19% |
-| Random Forest, perakende geçmişi | 9,974 | 13,939 | 38,58% |
-| HistGradientBoosting + gecikmeli Armut | 10,100 | 14,517 | 39,07% |
-| Random Forest + gecikmeli Armut | 10,323 | 14,687 | 39,93% |
+- Satılan birim sayısında ilk üç kategori Elektronik (1.821), Giyim (1.532) ve Ev & Yaşam (1.356).
+- Aylık toplamda en yüksek satış Kasımda (847); ardından Aralık (789) ve Ekim (622) geliyor.
 
-Bu test diliminde Armut'un 1 ve 7 gün gecikmeli sayımlarını eklemek iki algoritmanın da hatasını artırdı. Mevcut deney, Armut özelliğinin ürün tahminine fayda sağladığını göstermiyor. Modelin WAPE değeri yaklaşık %38 olduğundan stok kararı için yeterli doğruluk varsayılmamalıdır.
+Bu sayılar yalnızca elimizdeki 2.000 satış satırını özetliyor. Stokta bulunmayan ürünler, stok miktarı ve tedarik süresi verisi olmadığı için bu sonuçlardan yeniden sipariş miktarı çıkarmıyoruz. Satış satırlarının işletmenin tüm talebini temsil edip etmediği de doğrulanmalı.
 
-## Kategori ve dönem görünümü
+## Kaynak ve yeniden üretim
 
-- Satılan birim adedinde Elektronik (1.821), Giyim (1.532) ve Ev & Yaşam (1.356) ilk üç kategoridir.
-- 2024 aylık toplamında en yüksek birim Kasım (847), ardından Aralık (789) ve Ekim'de (622) görülmüştür.
+Temizleme sayıları `data/processed/cleaning_report.json` dosyasından alınmıştır. Alan tanımları ve veriyle ilgili diğer uyarılar [veri sözlüğünde](data_dictionary.md) bulunur.
 
-Bunlar yalnızca dosyadaki 2.000 satış satırının dağılımıdır. Satış kaydının tüm NovaPerakende talebini temsil edip etmediği bilinmiyor; stok miktarı, stokta yok bilgisi, ürün bazlı geçmiş ve tedarik süresi de yok. Şimdilik gerçek yeniden sipariş miktarı önermeyin. Daha uzun ve temsil gücü doğrulanmış veriyle, ürün ve stok durumu düzeyinde yeniden test edin.
-
-## Yeniden üretme
-
-- Temizleme: `docker compose run --rm --entrypoint python project /workspace/scripts/clean_data.py`
-- dbt: `docker compose run --rm project seed --full-refresh` ve `docker compose run --rm project build`
-- Mart aktarımı ve modeller: README'deki export ve train komutları.
