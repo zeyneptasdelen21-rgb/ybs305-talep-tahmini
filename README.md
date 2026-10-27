@@ -1,29 +1,33 @@
-# Armut Hizmet Talebi ve NovaPerakende Satışlarının Zaman Analizi ve Talep Tahmini
+# Proje: Armut Hizmet Talebi ve NovaPerakende Satışlarının Zaman Analizi ve Talep Tahmini
 
-**Ders:** YBS305 İş Zekâsı ve Veri Madenciliği · 2026–2027 Güz  
-**Ekip:** Aidana Almas, Zeynep Taşdelen, Rümeysa Kocatürk, Mercan Taşlıtarla, Helin Oğur  
-**Durum:** Yerel çalışan prototip — GitHub yayını ve hocanın ara teslim biçimine göre son paketleme bekliyor.
+## Problem ve amaç
 
-## 1. İş problemi
+Bu projede, Armut hizmet talepleri ile NovaPerakende ürün satışlarının 2024 yılı içindeki değişimini günlük toplamlar üzerinden inceliyoruz. İki veri kaynağı arasında günlük bir ilişki olup olmadığını değerlendiriyor; NovaPerakende satış geçmişinden kısa vadeli ürün talebi tahmini üreterek stok planlamasına yönelik öneriler geliştirmeyi amaçlıyoruz. Ayrıca Armut hizmet talebi bilgilerinin ürün talebi tahminine ek katkı sağlayıp sağlamadığını test ediyoruz.
 
-Armut hizmet talebi ve NovaPerakende ürün satışlarının zaman içindeki değişimini inceleyerek aralarındaki günlük ilişkiyi değerlendirmek; ayrıca perakende talebini tahmin ederek stok planlamasına yönelik öneriler geliştirmek.
+Armut ve perakende verilerinde ortak müşteri, bölge veya kategori eşleştirme alanı bulunmadığından kayıtları bu alanlarda doğrudan birleştirmiyoruz. Günlük ilişki analizini keşifsel olarak yorumluyoruz; korelasyon tek başına nedensellik veya tamamlayıcı ürün ilişkisi kanıtı değildir.
 
-**Araştırma soruları:** (1) 2024'te günlük Armut hizmet kayıt sayısı ile aynı gündeki NovaPerakende ürün satış adedi birlikte değişiyor mu? (2) Armut'un geçmiş günlük hizmet sayıları, takvim ve perakende satış geçmişinin ötesinde ürün talebi tahminine katkı sağlıyor mu? (3) NovaPerakende satış örüntüleri stok planlaması için hangi ölçülü önerileri destekliyor?
+## Veri kaynakları ve hazırlama
 
-> **Yorum sınırı:** Armut dosyasında şehir/bölge ve kategori adları yok; ortak müşteri anahtarı da bulunmuyor. Bu nedenle kayıtları müşteri veya kategori bazında birleştirmiyoruz. İki kaynağı yalnızca günlük toplamlar üzerinden keşifsel olarak karşılaştırıyoruz. İlişki bulgusu nedensellik veya tamamlayıcı ürün kanıtı değildir; Armut özelliğinin tahmine katkısı ayrıca test edilir ve ilk testte iyileşme görülmemiştir. Armut verisinin temsil ettiği coğrafya ve kaynağın kullanım koşulları eğitmenle doğrulanmalıdır.
+Analizde iki kaynak kullanılmıştır:
 
-## 2. El kitabı ve teknoloji kararı
+- **Armut:** 2024 kapsamındaki 65.732 hizmet kaydı, günlük ve hizmet kategorisi kodu düzeyinde toplulaştırılmıştır.
+- **NovaPerakende:** 2024’e ait 2.000 satış satırı, günlük ve ürün kategorisi düzeyinde toplulaştırılmıştır.
 
-El kitabı dbt Core + dbt-duckdb öneriyor; proje talebi PostgreSQL ve Docker kullanılmasını istiyor. Bu başlangıç sürümü PostgreSQL 16 + dbt-postgres'i Docker içinde çalıştırır. Bu, el kitabındaki örnek depodan bilinçli bir teknoloji sapmasıdır; PostgreSQL kullanımını eğitmenle teyit edin. Dashboard için el kitabındaki alternatiflerden Metabase kullanılır; son entegre ürün için Streamlit uygulaması da bulunur.
+Ham kaynak dosyalarındaki kullanıcı, hizmet, müşteri ve sipariş kimlikleri analiz tablolarına alınmamıştır. Tarih ve sayısal alanlar kontrol edilmiş; veriler anonim günlük toplamlara dönüştürülmüştür. Kaynakta kayıt bulunmayan günler sıfır olarak gösterilmiştir; bunun gerçekten hiç talep olmadığı anlamına gelmeyebileceği dikkate alınmalıdır.
 
-## 3. Veri ve temizleme
+## Teknoloji ve veri akışı
 
-Girdi dosyalarını `data/raw/` içine koyun. Kaynaklar Git tarafından yok sayılır. `scripts/clean_data.py` yalnızca 2024 kayıtlarını işler; tam satır tekrarlarını ve geçersiz kayıtları eler, tarih ve sayısal alanları doğrular, Armut'u gün+kategori koduna, perakendeyi gün ve gün+kategori düzeyine toplulaştırır. Kullanıcı/müşteri/sipariş kimlikleri ve şehir, ürün, maliyet gibi gereksiz detaylar dbt seed dosyalarına alınmaz. Çıktı `dbt/seeds/` altındaki anonim toplamlardır. Bu anonim seed CSV dosyaları yeniden üretilebilir oldukları için GitHub deposunda tutulur; yeni kaynak veriyi temizledikten sonra seed değişikliklerini commit edin. Özet temizleme sayıları `data/processed/cleaning_report.json` dosyasındadır.
+Veri hazırlama adımları Python ile yürütülür. PostgreSQL veri ambarı Docker Compose ile çalıştırılır; dbt modelleri veriyi staging, ara model ve mart katmanlarından geçirir. dbt testleri temel veri kalitesi kontrollerini yapar. Temiz mart verileri dashboard ve tahmin çalışmasında kullanılır.
 
-- Kaynak: `armut_data.csv` (162.523 satır; 2018 ve 2024 yılları; 2024 kapsamı 65.732 hizmet kaydı).
-- Kaynak: `perakende_satis.xlsx` (2.000 satır; 2024 yılı).
-- Temizleme özeti: yinelenen/tarih/satış değeri hatalı satır bulunmadı; Armut 2024 toplamlara 1.970 kategori-gün satırı, perakende 366 takvim-gün satırı üretti.
-- **Sıfır günler:** kaynakta satır olmayan günler günlük seriye sıfır olarak eklenir. Bu, gerçekten talep olmadığı anlamına gelmeyebilir; veri kapsamı doğrulanana dek bir varsayımdır.
-- Armut kategori kodları sayısal kaynak kodları olarak korunur; isim eşlemesi uydurulmaz.
+## Analiz ve ilk bulgular
+
+Günlük Armut hizmet kayıtları ile NovaPerakende ürün satışları arasındaki eşzamanlı ilişki incelenmiştir. Talep tahmini için NovaPerakende’nin geçmiş satışları ve takvim özellikleri kullanılarak iki algoritma karşılaştırılmış; Armut’un gecikmeli günlük sayımlarının eklenmesinin etkisi ayrıca değerlendirilmiştir.
+
+İlk kronolojik testte en düşük hata, yalnızca perakende geçmişi ve takvim özelliklerini kullanan HistGradientBoosting modelinde elde edilmiştir (MAE: 9,872 adet; WAPE: %38,19). Armut verisini eklemek bu testte tahmin hatasını düşürmemiştir. Bu nedenle mevcut model sonuçları bir ders prototipi olarak değerlendirilmelidir; gerçek satın alma veya stok kararlarında doğrudan kullanılmamalıdır.
+
+## Ekip çalışması
+
+Ekip üyelerinin sorumlulukları README’deki görev dağılımı bölümünde yer alır. Katkılar GitHub’da kişilerin kendi dallarında açtıkları Pull Request’ler ve commit’ler üzerinden takip edilir.
+
 
 
