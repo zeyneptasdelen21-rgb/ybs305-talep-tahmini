@@ -1,0 +1,35 @@
+name: dbt validation
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  dbt-build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: retail_analytics
+          POSTGRES_USER: analyst
+          POSTGRES_PASSWORD: ci_password
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U analyst -d retail_analytics"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DBT_HOST: localhost
+      DBT_USER: analyst
+      DBT_PASSWORD: ci_password
+      DBT_DB: retail_analytics
+      DBT_SCHEMA: analytics
+      DBT_PROFILES_DIR: ${{ github.workspace }}/dbt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: dbt build --project-dir dbt --profiles-dir dbt

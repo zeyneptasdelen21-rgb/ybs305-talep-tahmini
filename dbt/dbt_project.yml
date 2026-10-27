@@ -1,0 +1,39 @@
+name: 'complementary_demand'
+version: '1.0.0'
+config-version: 2
+profile: 'complementary_demand'
+model-paths: ['models']
+seed-paths: ['seeds']
+test-paths: ['tests']
+macro-paths: ['macros']
+clean-targets: ['target', 'dbt_packages']
+models:
+  complementary_demand:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table
+seeds:
+  complementary_demand:
+    +quote_columns: false
+    armut_daily:
+      +column_types:
+        event_date: date
+        category_id: varchar(20)
+        service_requests: integer
+    retail_daily:
+      +column_types:
+        sale_date: date
+        order_lines: integer
+        units_sold: integer
+        gross_sales: numeric(14,2)
+        net_sales: numeric(14,2)
+    retail_category_daily:
+      +column_types:
+        sale_date: date
+        category: varchar(100)
+        order_lines: integer
+        units_sold: integer
+        net_sales: numeric(14,2)

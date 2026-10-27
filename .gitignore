@@ -1,0 +1,19 @@
+# Local source files: never publish customer/user-level data
+/data/raw/*
+!/data/raw/.gitkeep
+# Local warehouse and generated artifacts
+*.duckdb
+*.duckdb.wal
+*.db
+*.log
+/dbt/target/
+/dbt/logs/
+/dbt/dbt_packages/
+/dbt/.user.yml
+/model/artifacts/
+.streamlit/secrets.toml
+.env
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/

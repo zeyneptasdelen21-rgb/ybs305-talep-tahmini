@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: mart_daily_demand
+    description: "Keşifsel günlük hizmet-satış talep görünümü; eşleşme yalnızca takvim gününe göredir."
+    columns:
+      - name: demand_date
+        tests: [not_null, unique]
+      - name: armut_service_requests
+        tests: [not_null]
+      - name: retail_units_sold
+        tests: [not_null]
+  - name: mart_monthly_demand
+    description: "Dashboard KPI'ları ve keşifsel dönemsel ilişki incelemesi için aylık toplamlar."
+    columns:
+      - name: demand_month
+        tests: [not_null, unique]
+      - name: retail_units_sold
+        tests: [not_null]
+  - name: mart_retail_category_daily
+    description: "Günlük ürün kategorisi bazlı satış; Armut kategori kodlarıyla eşlenmemiştir."
+    columns:
+      - name: sale_date
+        tests: [not_null]
+      - name: category
+        tests: [not_null]
