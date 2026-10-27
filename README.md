@@ -76,6 +76,7 @@ Girdi dosyalarını `data/raw/` içine koyun. Kaynaklar Git tarafından yok say�
 ### PostgreSQL kimlik bilgileri
 
 Yerel geliştirme için Compose dosyasındaki `analyst/local_dev_only` kullanılır; internete açık veritabanına açmayın. GitHub Actions ayrı geçici test kimlik bilgileri kullanır. Gerçek bir sunucuya geçerken parolayı ortam değişkeni/secret ile yönetin.
+Host makineden pgAdmin gibi bir araçla bağlanırken `localhost:5434` kullanılır; Docker içindeki dbt ve Metabase `warehouse:5432` adresini kullanır. Bu port ayrımı, bilgisayarda 5432 ve 5433'ü kullanan mevcut servis/container'lara dokunmamak içindir.
 
 ## 5. dbt katmanları
 
@@ -89,7 +90,7 @@ Bu yapı en az üç dönüşüm modelini ve birden çok dbt testini içerir. Mar
 
 ## 6. Dashboard ve tahmin
 
-Streamlit uygulaması üç KPI (hizmet kaydı, ürün adedi, net satış), üç grafik ve tarih aralığı filtresi içerir. Tahmin hedefi günlük toplam perakende ürün adedidir; özellikler önceki 1/7/28 gün satışları ve takvim alanlarıdır. Random Forest ile HistGradientBoosting, kronolojik son %20 test aralığında MAE, RMSE ve WAPE ile karşılaştırılır. Model seçimi test MAE'si en düşük olana göre yapılır. Eğitim verisi yalnızca 2024 ve 2.000 kaynak satış satırı olduğu için tahmin bir ders prototipidir; güncel satın alma/stok kararı olarak kullanılmamalıdır.
+Metabase ara teslim panosunda üç KPI (hizmet kaydı, ürün adedi, net satış), üç grafik ve tarih filtresi kurulur. Streamlit son uygulamasında bunlara ek olarak günlük perakende talep modeli bulunur. Tahmin hedefi ürün adedidir; baz model önceki 1/7/28 gün satışları ve takvim alanlarını kullanır. Random Forest ve HistGradientBoosting kronolojik test aralığında MAE, RMSE ve WAPE ile karşılaştırılır; ayrıca gecikmeli Armut sayımlarının ek faydası denenir. İlk ölçümde en düşük MAE, HistGradientBoosting perakende-geçmişi baz modelindeydi (MAE 9,872; RMSE 13,560; WAPE %38,19). Armut gecikmelerini eklemek hatayı düşürmedi. Bu sonuçlar ve veri sınırları [analiz özetinde](docs/analysis_summary.md); model amacı ve kartı [model kartında](docs/model_card.md). Eğitim verisi yalnızca 2024 ve 2.000 kaynak satış satırı olduğu için tahmin bir ders prototipidir; güncel satın alma/stok kararı olarak kullanılmamalıdır.
 
 ## 7. GitHub'da grup çalışması ve raporlama
 
