@@ -36,15 +36,15 @@ Bu sonuç iki verinin birbiriyle ilişkili olduğunu tek başına kanıtlamaz. O
 
 Kaynak dosyalar yerel `data/raw/` klasöründe tutulur. `scripts/clean_data.py` dosyaları temizleyip anonim toplamlara dönüştürür. Bu çıktılar dbt seed’lerine yüklenir; PostgreSQL üzerinde staging, ara model ve mart katmanlarından geçer. Dashboard günlük ve kategori martlarını kullanır.
 
-Ham dosyalar GitHub’a eklenmez. Dashboard’ın son teslimi, çalışan bir `.pbix` dosyası veya paylaşılabilir yayımlanmış bağlantı olmalıdır.
+Ham dosyalar GitHub’a eklenmez. Dashboard şu anda yerelde çalışıyor; teslim için çalışan bir `.pbix` dosyası veya paylaşılabilir yayımlanmış bağlantı hazırlanması gerekiyor.
 
 ## Görev paylaşımı
 
 Aşağıdaki dağılım, 13 Kasım teslimi için önerilen sorumlulukları gösteriyor. Bir dosyanın depoda bulunması, listedeki kişinin o işi tamamladığını tek başına göstermez; katkılar kişisel dal, Pull Request ve commit’lerle takip edilir.
 
 - **Aidana Almas — Problem ve veri hazırlığı:** Araştırma sorusunu netleştirir; kaynak alanları ve veri kalitesini inceler; ham veriyi temizleyip kimlik bilgilerini analiz çıktılarından çıkarır. Temizleme raporunu ve veri sınırlılıklarını açıklar.
-- **Zeynep Taşdelen — dbt ve veri kontrolleri:** Staging, ara model ve mart dönüşümlerini yürütür; veri testlerini ve dbt belgelerini kontrol eder.
-- **Rümeysa Kocatürk — Dashboard:** Martları kullanarak hizmet kaydı sayısı, satılan ürün adedi ve net satış KPI’larını; en az üç grafik ve tarih filtresini hazırlar. Çıktı olarak `.pbix` dosyası veya yayımlanmış bağlantı sunar.
+- **Zeynep Taşdelen — dbt ve veri kontrolleri:** Staging, ara model ve mart dönüşümlerini yürütür; en az üç veri testini ve dbt belgelerini kontrol eder.
+- **Rümeysa Kocatürk — Dashboard:** Martları kullanarak hizmet kaydı sayısı, satılan ürün adedi ve net satış KPI’larını; en az üç grafik ve tarih filtresini hazırlar. Grafiklerin ne gösterdiğini açıklar. Çıktı olarak `.pbix` dosyası veya yayımlanmış bağlantı sunar.
 - **Mercan Taşlıtarla — İlişki analizi:** Günlük ilişki bulgusunu ve sınırlarını doğrular, anlaşılır biçimde raporlar. Tahmin modeli ve model kartı final çalışmasına kalır.
 - **Helin Oğur — Kurulum ve ortak dokümantasyon:** Docker ve GitHub Actions kurulumunu ekipte doğrular; README’yi, veri sözlüğünü ve GitHub katkı akışını düzenler.
 
