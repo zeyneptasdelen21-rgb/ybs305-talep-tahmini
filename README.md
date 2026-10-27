@@ -1,6 +1,12 @@
 # Armut Hizmet Talebi ve NovaPerakende Satış Analizi
 
-Bu projede Armut hizmet kayıtları ile NovaPerakende satışlarını 2024 yılı için inceliyoruz. İlk teslimde iki kaynağın günlük toplamları arasındaki ilişkiye odaklanıyoruz. Talep tahmin modeli ve model kartı final çalışmasında ele alınacak.
+## Problem ve amaç
+
+Perakendecinin hangi dönemlerde ürün talebinin arttığını veya azaldığını görebilmesi, stok planlamasını geçmiş satışlara göre yapmasına yardımcı olur. Projede Armut hizmet talepleri ile NovaPerakende ürün satışlarının zaman içindeki değişimini inceliyor, aralarındaki günlük ilişkiyi değerlendiriyoruz. Perakende talep tahmini ve stok önerileri de projenin genel hedefleri arasında.
+
+**Proje problemimiz:** Armut hizmet talebi ile NovaPerakende ürün satışlarının zaman içindeki değişimini inceleyerek aralarındaki günlük ilişkiyi değerlendirmek; perakende talebini tahmin edip stok planlamasına yönelik öneriler geliştirmek.
+
+**13 Kasım’daki ilk teslimin kapsamı:** Veri hazırlığı, günlük ilişki analizi, dbt dönüşümleri ve dashboard. Talep tahmin modeli ile model kartı bu teslim kapsamında değil; final çalışmasına bırakıldı.
 
 ## Araştırma sorusu
 
