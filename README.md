@@ -19,15 +19,10 @@ Ham kaynak dosyalarındaki kullanıcı, hizmet, müşteri ve sipariş kimlikleri
 
 Veri hazırlama adımları Python ile yürütülür. PostgreSQL veri ambarı Docker Compose ile çalıştırılır; dbt modelleri veriyi staging, ara model ve mart katmanlarından geçirir. dbt testleri temel veri kalitesi kontrollerini yapar. Temiz mart verileri dashboard ve tahmin çalışmasında kullanılır.
 
-## Analiz ve ilk bulgular
+## Bölüm 1: İlişki analizi
 
-Günlük Armut hizmet kayıtları ile NovaPerakende ürün satışları arasındaki eşzamanlı ilişki incelenmiştir. Talep tahmini için NovaPerakende’nin geçmiş satışları ve takvim özellikleri kullanılarak iki algoritma karşılaştırılmış; Armut’un gecikmeli günlük sayımlarının eklenmesinin etkisi ayrıca değerlendirilmiştir.
-
-İlk kronolojik testte en düşük hata, yalnızca perakende geçmişi ve takvim özelliklerini kullanan HistGradientBoosting modelinde elde edilmiştir (MAE: 9,872 adet; WAPE: %38,19). Armut verisini eklemek bu testte tahmin hatasını düşürmemiştir. Bu nedenle mevcut model sonuçları bir ders prototipi olarak değerlendirilmelidir; gerçek satın alma veya stok kararlarında doğrudan kullanılmamalıdır.
+Bu bölümde günlük Armut hizmet kayıtları ile NovaPerakende ürün satışları arasındaki eşzamanlı ilişki incelenir. Bulgular keşifsel olarak yorumlanır; korelasyon nedensellik veya tamamlayıcı ürün ilişkisi kanıtı sayılmaz. Talep tahmin modeli ve model kartı final çalışmasına bırakılmıştır.
 
 ## Ekip çalışması
 
 Ekip üyelerinin sorumlulukları README’deki görev dağılımı bölümünde yer alır. Katkılar GitHub’da kişilerin kendi dallarında açtıkları Pull Request’ler ve commit’ler üzerinden takip edilir.
-
-
-
