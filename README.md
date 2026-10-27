@@ -1,28 +1,44 @@
-# Proje: Armut Hizmet Talebi ve NovaPerakende Satışlarının Zaman Analizi ve Talep Tahmini
+# Armut Hizmet Talebi ve NovaPerakende Satış Analizi
 
-## Problem ve amaç
+Bu projede Armut hizmet kayıtları ile NovaPerakende satışlarını 2024 yılı için inceliyoruz. İlk teslimde iki kaynağın günlük toplamları arasındaki ilişkiye odaklanıyoruz. Talep tahmin modeli ve model kartı final çalışmasında ele alınacak.
 
-Bu projede, Armut hizmet talepleri ile NovaPerakende ürün satışlarının 2024 yılı içindeki değişimini günlük toplamlar üzerinden inceliyoruz. İki veri kaynağı arasında günlük bir ilişki olup olmadığını değerlendiriyor; NovaPerakende satış geçmişinden kısa vadeli ürün talebi tahmini üreterek stok planlamasına yönelik öneriler geliştirmeyi amaçlıyoruz. Ayrıca Armut hizmet talebi bilgilerinin ürün talebi tahminine ek katkı sağlayıp sağlamadığını test ediyoruz.
+## Araştırma sorusu
 
-Armut ve perakende verilerinde ortak müşteri, bölge veya kategori eşleştirme alanı bulunmadığından kayıtları bu alanlarda doğrudan birleştirmiyoruz. Günlük ilişki analizini keşifsel olarak yorumluyoruz; korelasyon tek başına nedensellik veya tamamlayıcı ürün ilişkisi kanıtı değildir.
+2024 yılında günlük Armut hizmet kaydı sayısı ile aynı gündeki NovaPerakende satış adedi birlikte değişiyor mu?
 
-## Veri kaynakları ve hazırlama
+İki veri kümesinde ortak müşteri, şehir/bölge veya kategori anahtarı yok. Bu nedenle kayıtları kişi, bölge ya da kategori bazında eşleştirmiyoruz; karşılaştırmayı günlük toplamlar üzerinden yapıyoruz.
 
-Analizde iki kaynak kullanılmıştır:
+## Veri ve hazırlık
 
-- **Armut:** 2024 kapsamındaki 65.732 hizmet kaydı, günlük ve hizmet kategorisi kodu düzeyinde toplulaştırılmıştır.
-- **NovaPerakende:** 2024’e ait 2.000 satış satırı, günlük ve ürün kategorisi düzeyinde toplulaştırılmıştır.
+Kullandığımız dosyalar 2018 ve 2024 yıllarını kapsayan Armut kayıtları ile 2024 NovaPerakende satışlarıdır. Analizi yalnızca 2024 verileriyle yaptık.
 
-Ham kaynak dosyalarındaki kullanıcı, hizmet, müşteri ve sipariş kimlikleri analiz tablolarına alınmamıştır. Tarih ve sayısal alanlar kontrol edilmiş; veriler anonim günlük toplamlara dönüştürülmüştür. Kaynakta kayıt bulunmayan günler sıfır olarak gösterilmiştir; bunun gerçekten hiç talep olmadığı anlamına gelmeyebileceği dikkate alınmalıdır.
+- Armut dosyasındaki 162.523 satırın 65.732’si 2024 yılına ait. Temizleme sonrasında kayıtlar gün ve kategori koduna göre toplandı; 1.970 anonim satır elde edildi.
+- NovaPerakende dosyasında 2.000 satış satırı bulunuyor. Bunlar gün bazında toplandığında 366 satırlık bir seri oluşuyor.
+- Temizleme raporunda yinelenen veya geçersiz satır çıkarılmadı. Kimlik alanları ve analize girmeyen ayrıntılar çıktı dosyalarına taşınmadı.
+- Kaynakta satır bulunmayan günler sıfır olarak yazıldı. Bu değerler gerçek sıfır talep anlamına gelmeyebilir; veri kapsamı hakkında bir varsayımdır.
+- Armut kategori kodlarının ad karşılığı verilmediği için kodları olduğu gibi koruduk.
 
-## Teknoloji ve veri akışı
+Temizleme ayrıntıları [veri sözlüğünde](docs/data_dictionary.md), günlük ilişki sonuçları ise [analiz özetinde](docs/analysis_summary.md) yer alıyor.
 
-Veri hazırlama adımları Python ile yürütülür. PostgreSQL veri ambarı Docker Compose ile çalıştırılır; dbt modelleri veriyi staging, ara model ve mart katmanlarından geçirir. dbt testleri temel veri kalitesi kontrollerini yapar. Temiz mart verileri dashboard ve tahmin çalışmasında kullanılır.
+## İlk teslim: günlük ilişki
 
-## Bölüm 1: İlişki analizi
+Günlük Armut hizmet kayıtları ile NovaPerakende ürün adedi arasındaki Pearson korelasyonu **0,4028**, Spearman korelasyonu **0,3981** olarak hesaplandı. Bu değerler, 2024 günlük toplamlarında orta düzeyde pozitif bir eşzamanlı hareket olduğunu gösteriyor.
 
-Bu bölümde günlük Armut hizmet kayıtları ile NovaPerakende ürün satışları arasındaki eşzamanlı ilişki incelenir. Bulgular keşifsel olarak yorumlanır; korelasyon nedensellik veya tamamlayıcı ürün ilişkisi kanıtı sayılmaz. Talep tahmin modeli ve model kartı final çalışmasına bırakılmıştır.
+Bu sonuç iki verinin birbiriyle ilişkili olduğunu tek başına kanıtlamaz. Ortak müşteri, bölge veya kategori bilgisi bulunmuyor; mevsim, haftanın günü ve genel zaman eğilimleri sonucu etkilemiş olabilir. Bu yüzden korelasyonu keşifsel bir bulgu olarak değerlendiriyoruz; nedensellik ya da tamamlayıcı ürün ilişkisi iddiasında bulunmuyoruz.
 
-## Ekip çalışması
+## Veri akışı
 
-Ekip üyelerinin sorumlulukları README’deki görev dağılımı bölümünde yer alır. Katkılar GitHub’da kişilerin kendi dallarında açtıkları Pull Request’ler ve commit’ler üzerinden takip edilir.
+Kaynak dosyalar yerel `data/raw/` klasöründe tutulur. `scripts/clean_data.py` dosyaları temizleyip anonim toplamlara dönüştürür. Bu çıktılar dbt seed’lerine yüklenir; PostgreSQL üzerinde staging, ara model ve mart katmanlarından geçer. Dashboard günlük ve kategori martlarını kullanır.
+
+Ham dosyalar GitHub’a eklenmez. Dashboard’ın son teslimi, çalışan bir `.pbix` dosyası veya paylaşılabilir yayımlanmış bağlantı olmalıdır.
+
+## Görev paylaşımı
+
+Aşağıdaki dağılım, 13 Kasım teslimi için önerilen sorumlulukları gösteriyor. Bir dosyanın depoda bulunması, listedeki kişinin o işi tamamladığını tek başına göstermez; katkılar kişisel dal, Pull Request ve commit’lerle takip edilir.
+
+- **Aidana Almas — Problem ve veri hazırlığı:** Araştırma sorusunu netleştirir; kaynak alanları ve veri kalitesini inceler; ham veriyi temizleyip kimlik bilgilerini analiz çıktılarından çıkarır. Temizleme raporunu ve veri sınırlılıklarını açıklar.
+- **Zeynep Taşdelen — dbt ve veri kontrolleri:** Staging, ara model ve mart dönüşümlerini yürütür; veri testlerini ve dbt belgelerini kontrol eder.
+- **Rümeysa Kocatürk — Dashboard:** Martları kullanarak hizmet kaydı sayısı, satılan ürün adedi ve net satış KPI’larını; en az üç grafik ve tarih filtresini hazırlar. Çıktı olarak `.pbix` dosyası veya yayımlanmış bağlantı sunar.
+- **Mercan Taşlıtarla — İlişki analizi:** Günlük ilişki bulgusunu ve sınırlarını doğrular, anlaşılır biçimde raporlar. Tahmin modeli ve model kartı final çalışmasına kalır.
+- **Helin Oğur — Kurulum ve ortak dokümantasyon:** Docker ve GitHub Actions kurulumunu ekipte doğrular; README’yi, veri sözlüğünü ve GitHub katkı akışını düzenler.
+
