@@ -1,13 +1,10 @@
-"""Clean source files locally and create anonymous daily aggregates for dbt seeds."""
 from __future__ import annotations
 
-import csv
 import json
-from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-import openpyxl
+import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
@@ -16,120 +13,172 @@ REPORT = ROOT / "data" / "processed" / "cleaning_report.json"
 START, END = date(2024, 1, 1), date(2024, 12, 31)
 
 
-def write_csv(path: Path, rows: list[dict], fields: list[str]) -> None:
+def write_csv(path: Path, frame: pd.DataFrame) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fields)
-        writer.writeheader()
-        writer.writerows(rows)
+    frame.to_csv(path, index=False, encoding="utf-8")
 
 
 def main() -> None:
     armut_source = RAW / "armut_data.csv"
     retail_source = RAW / "perakende_satis.xlsx"
     if not armut_source.exists() or not retail_source.exists():
-        raise FileNotFoundError("Place both source files in data/raw/; see README.md")
+        raise FileNotFoundError("Place both source files in data/raw/; expected armut_data.csv and perakende_satis.xlsx")
 
-    armut_counts: Counter = Counter()
-    armut_input_rows = armut_bad_dates = armut_duplicates = 0
-    seen_armut: set[tuple[str, ...]] = set()
-    with armut_source.open(encoding="utf-8-sig", newline="") as f:
-        for row in csv.DictReader(f):
-            armut_input_rows += 1
-            key = tuple(row.get(k, "") for k in ("UserId", "ServiceId", "CategoryId", "CreateDate"))
-            if key in seen_armut:
-                armut_duplicates += 1
-                continue
-            seen_armut.add(key)
-            try:
-                day = date.fromisoformat(row["CreateDate"][:10])
-                category = str(int(row["CategoryId"]))
-            except (ValueError, TypeError, KeyError):
-                armut_bad_dates += 1
-                continue
-            if START <= day <= END:
-                armut_counts[(day.isoformat(), category)] += 1
+    # Armut: inspect missing values and exact duplicate records with pandas.
+    armut = pd.read_csv(armut_source, encoding="utf-8-sig")
+    armut_required = ["UserId", "ServiceId", "CategoryId", "CreateDate"]
+    if not set(armut_required).issubset(armut.columns):
+        raise ValueError(f"Armut file is missing columns: {sorted(set(armut_required) - set(armut.columns))}")
+    armut_input_rows = len(armut)
+    armut_missing = int(armut[armut_required].isna().sum().sum())
+    armut_duplicate_rows = int(armut.duplicated(subset=armut_required).sum())
+    armut = armut.drop_duplicates(subset=armut_required).copy()
+    armut["_date"] = pd.to_datetime(armut["CreateDate"], errors="coerce")
+    armut["_category"] = pd.to_numeric(armut["CategoryId"], errors="coerce")
+    armut_invalid_mask = armut["_date"].isna() | armut["_category"].isna()
+    armut_invalid_rows = int(armut_invalid_mask.sum())
+    armut = armut.loc[~armut_invalid_mask].copy()
+    armut["_day"] = armut["_date"].dt.date
+    armut = armut.loc[armut["_day"].between(START, END)].copy()
+    armut["event_date"] = armut["_day"].astype(str)
+    armut["category_id"] = armut["_category"].astype("int64").astype(str)
+    armut_daily = (
+        armut.groupby(["event_date", "category_id"], as_index=False)
+        .size()
+        .rename(columns={"size": "service_requests"})
+    )
+    armut_rows_in_year = int(armut_daily["service_requests"].sum())
 
-    wb = openpyxl.load_workbook(retail_source, read_only=True, data_only=True)
-    ws = wb.active
-    it = ws.iter_rows(values_only=True)
-    headers = next(it)
-    required = {"Tarih", "Kategori", "Miktar", "BirimFiyat", "IndirimOrani"}
-    if not required.issubset(set(headers)):
-        raise ValueError(f"Missing retail columns: {sorted(required - set(headers))}")
-    idx = {name: headers.index(name) for name in required}
-    retail_daily = defaultdict(lambda: {"order_lines": 0, "units": 0, "gross_sales": 0.0, "net_sales": 0.0})
-    retail_category = defaultdict(lambda: {"order_lines": 0, "units": 0, "net_sales": 0.0})
-    retail_input_rows = retail_bad_rows = retail_duplicates = 0
-    seen_retail: set[tuple] = set()
-    for row in it:
-        retail_input_rows += 1
-        try:
-            day = row[idx["Tarih"]]
-            if isinstance(day, str):
-                day = date.fromisoformat(day[:10])
-            elif hasattr(day, "date"):
-                day = day.date()
-            category = str(row[idx["Kategori"]]).strip()
-            units = int(row[idx["Miktar"]])
-            price = float(row[idx["BirimFiyat"]])
-            discount = float(row[idx["IndirimOrani"]] or 0)
-            if not category or units < 0 or price < 0 or not 0 <= discount <= 1:
-                raise ValueError("invalid value")
-        except (ValueError, TypeError, IndexError):
-            retail_bad_rows += 1
-            continue
-        key = tuple(row)
-        if key in seen_retail:
-            retail_duplicates += 1
-            continue
-        seen_retail.add(key)
-        if not START <= day <= END:
-            continue
-        date_key = day.isoformat()
-        gross = units * price
-        net = gross * (1 - discount)
-        retail_daily[date_key]["order_lines"] += 1
-        retail_daily[date_key]["units"] += units
-        retail_daily[date_key]["gross_sales"] += gross
-        retail_daily[date_key]["net_sales"] += net
-        retail_category[(date_key, category)]["order_lines"] += 1
-        retail_category[(date_key, category)]["units"] += units
-        retail_category[(date_key, category)]["net_sales"] += net
+    # Retail: inspect missing values, remove exact duplicates, and validate values.
+    retail = pd.read_excel(retail_source)
+    retail_required = ["Tarih", "Kategori", "Miktar", "BirimFiyat", "IndirimOrani"]
+    if not set(retail_required).issubset(retail.columns):
+        raise ValueError(f"Retail file is missing columns: {sorted(set(retail_required) - set(retail.columns))}")
+    retail_input_rows = len(retail)
+    retail_missing_by_column = {
+        str(column): int(count)
+        for column, count in retail[retail_required].isna().sum().items()
+    }
+    retail_missing_cells = int(sum(retail_missing_by_column.values()))
+    retail_duplicate_rows = int(retail.duplicated().sum())
+    retail = retail.drop_duplicates().copy()
 
-    # Full calendar makes unobserved days explicit as zero for exploratory alignment.
-    calendar = [START + timedelta(days=n) for n in range((END - START).days + 1)]
-    armut_rows = []
-    retail_rows = []
-    retail_cat_rows = []
-    for day in calendar:
-        d = day.isoformat()
-        cats = sorted((cat for (dt, cat) in armut_counts if dt == d), key=int)
-        if cats:
-            armut_rows.extend({"event_date": d, "category_id": cat, "service_requests": armut_counts[(d, cat)]} for cat in cats)
-        else:
-            armut_rows.append({"event_date": d, "category_id": "unknown", "service_requests": 0})
-        x = retail_daily[d]
-        retail_rows.append({"sale_date": d, "order_lines": x["order_lines"], "units_sold": x["units"], "gross_sales": round(x["gross_sales"], 2), "net_sales": round(x["net_sales"], 2)})
-        cat_keys = sorted((cat for (dt, cat) in retail_category if dt == d))
-        for cat in cat_keys:
-            y = retail_category[(d, cat)]
-            retail_cat_rows.append({"sale_date": d, "category": cat, "order_lines": y["order_lines"], "units_sold": y["units"], "net_sales": round(y["net_sales"], 2)})
+    retail["_date"] = pd.to_datetime(retail["Tarih"], errors="coerce")
+    retail["_category"] = retail["Kategori"].astype("string").str.strip()
+    retail["_units"] = pd.to_numeric(retail["Miktar"], errors="coerce")
+    retail["_price"] = pd.to_numeric(retail["BirimFiyat"], errors="coerce")
+    retail["_discount"] = pd.to_numeric(retail["IndirimOrani"], errors="coerce").fillna(0)
+    # Missing discount means no recorded discount; missing required values are excluded below.
+    retail_invalid_mask = (
+        retail["_date"].isna()
+        | retail["_category"].isna()
+        | retail["_category"].eq("")
+        | retail["_units"].isna()
+        | retail["_price"].isna()
+        | (retail["_units"] < 0)
+        | (retail["_price"] < 0)
+        | ~retail["_discount"].between(0, 1)
+    )
+    retail_negative_prices = int((retail["_price"] < 0).sum())
+    retail_negative_units = int((retail["_units"] < 0).sum())
+    retail_invalid_rows = int(retail_invalid_mask.sum())
+    retail = retail.loc[~retail_invalid_mask].copy()
+    retail["_day"] = retail["_date"].dt.date
+    retail = retail.loc[retail["_day"].between(START, END)].copy()
+    retail["sale_date"] = retail["_day"].astype(str)
+    retail["order_lines"] = 1
+    retail["units_sold"] = retail["_units"].astype("int64")
+    retail["gross_sales"] = retail["units_sold"] * retail["_price"]
+    retail["net_sales"] = retail["gross_sales"] * (1 - retail["_discount"])
 
-    write_csv(SEEDS / "armut_daily.csv", armut_rows, ["event_date", "category_id", "service_requests"])
-    write_csv(SEEDS / "retail_daily.csv", retail_rows, ["sale_date", "order_lines", "units_sold", "gross_sales", "net_sales"])
-    write_csv(SEEDS / "retail_category_daily.csv", retail_cat_rows, ["sale_date", "category", "order_lines", "units_sold", "net_sales"])
+    retail_daily = (
+        retail.groupby("sale_date", as_index=False)
+        .agg(
+            order_lines=("order_lines", "sum"),
+            units_sold=("units_sold", "sum"),
+            gross_sales=("gross_sales", "sum"),
+            net_sales=("net_sales", "sum"),
+        )
+    )
+    retail_category_daily = (
+        retail.groupby(["sale_date", "_category"], as_index=False)
+        .agg(
+            order_lines=("order_lines", "sum"),
+            units_sold=("units_sold", "sum"),
+            net_sales=("net_sales", "sum"),
+        )
+        .rename(columns={"_category": "category"})
+    )
+    retail_rows_in_year = int(retail["order_lines"].sum())
+
+    # Add every day of 2024 to the daily series. A missing source date is recorded as zero.
+    calendar = pd.date_range(START, END, freq="D").strftime("%Y-%m-%d")
+    retail_daily = retail_daily.set_index("sale_date").reindex(calendar, fill_value=0)
+    retail_daily.index.name = "sale_date"
+    retail_daily = retail_daily.reset_index()
+    retail_daily["gross_sales"] = retail_daily["gross_sales"].round(2)
+    retail_daily["net_sales"] = retail_daily["net_sales"].round(2)
+
+    armut_days = set(armut_daily["event_date"])
+    missing_armut_days = [day for day in calendar if day not in armut_days]
+    if missing_armut_days:
+        armut_daily = pd.concat(
+            [
+                armut_daily,
+                pd.DataFrame(
+                    {
+                        "event_date": missing_armut_days,
+                        "category_id": ["unknown"] * len(missing_armut_days),
+                        "service_requests": [0] * len(missing_armut_days),
+                    }
+                ),
+            ],
+            ignore_index=True,
+        )
+
+    write_csv(SEEDS / "armut_daily.csv", armut_daily[["event_date", "category_id", "service_requests"]])
+    write_csv(SEEDS / "retail_daily.csv", retail_daily[["sale_date", "order_lines", "units_sold", "gross_sales", "net_sales"]])
+    write_csv(SEEDS / "retail_category_daily.csv", retail_category_daily[["sale_date", "category", "order_lines", "units_sold", "net_sales"]])
+
     report = {
         "scope": "calendar year 2024",
+        "method": "pandas; missing values, exact duplicates, dates and numeric ranges inspected",
         "sources": {
-            "armut": {"input_rows": armut_input_rows, "duplicate_rows_removed": armut_duplicates, "invalid_rows_removed": armut_bad_dates, "rows_in_2024": sum(armut_counts.values()), "output_aggregate_rows": len(armut_rows), "identifier_columns_removed": ["UserId", "ServiceId"]},
-            "retail": {"input_rows": retail_input_rows, "duplicate_rows_removed": retail_duplicates, "invalid_rows_removed": retail_bad_rows, "rows_in_2024": sum(v["order_lines"] for v in retail_daily.values()), "output_daily_rows": len(retail_rows), "identifier_columns_removed": ["SiparisID", "Musteri_ID", "Sehir", "Bolge", "Kanal", "Urun", "BirimFiyat", "Maliyet"]}
+            "armut": {
+                "input_rows": armut_input_rows,
+                "missing_required_cells": armut_missing,
+                "duplicate_rows_removed": armut_duplicate_rows,
+                "invalid_rows_removed": armut_invalid_rows,
+                "rows_in_2024": armut_rows_in_year,
+                "output_aggregate_rows": len(armut_daily),
+                "identifier_columns_removed": ["UserId", "ServiceId"],
+            },
+            "retail": {
+                "input_rows": retail_input_rows,
+                "missing_cells_by_required_column": retail_missing_by_column,
+                "missing_required_cells": retail_missing_cells,
+                "duplicate_rows_removed": retail_duplicate_rows,
+                "negative_price_rows": retail_negative_prices,
+                "negative_unit_rows": retail_negative_units,
+                "invalid_rows_removed": retail_invalid_rows,
+                "rows_in_2024": retail_rows_in_year,
+                "output_daily_rows": len(retail_daily),
+                "identifier_columns_removed": ["SiparisID", "Musteri_ID", "Sehir", "Bolge", "Kanal", "Urun", "BirimFiyat", "Maliyet"],
+            },
         },
-        "notes": ["Outputs are aggregates; user/customer identifiers are excluded.", "Days with no source rows are represented as zero; verify whether source coverage means true zero demand.", "Armut category_id values remain numeric source codes; no category-name mapping was supplied."]
+        "notes": [
+            "Outputs are aggregates; user/customer identifiers are excluded.",
+            "A missing discount is treated as 0 (no recorded discount); rows missing other required values are excluded.",
+            "Days with no source rows are represented as zero; verify whether source coverage means true zero demand.",
+            "Armut category_id values remain numeric source codes; no category-name mapping was supplied.",
+        ],
     }
     REPORT.parent.mkdir(parents=True, exist_ok=True)
     REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
+
 if __name__ == "__main__":
     main()
+
+
