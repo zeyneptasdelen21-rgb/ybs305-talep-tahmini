@@ -7,7 +7,23 @@
 | Armut hizmet kayıtları | `armut_data.csv` | 2018 ve 2024; analiz 2024 | UserId, ServiceId, CategoryId, CreateDate; 2024 içinde 65.732 kayıt | Kullanıcı/hizmet kimliği çıkarılır; gün-kategori sayımı tutulur |
 | NovaPerakende | `perakende_satis.xlsx` | 2024 | 2.000 satır; 12 sütun, 5 ürün kategorisi | Sipariş/müşteri kimlikleri ve ayrıntılı lokasyon/ürün/maliyet alanları çıkarılır; günlük toplama tutulur |
 
-**Atıf/lisans alanı:** Veriyi sağlayan sayfa/kurum, URL, erişim tarihi ve yeniden dağıtım izni ekip tarafından eklenmelidir. Bu bilgiler eklenmeden ham dosyaları yayımlamayın.
+### Kaynak ve kullanım notu
+
+- **NovaPerakende:** `perakende_satis.xlsx`, YBS305 dersi kapsamında Ece hocamız tarafından Teams üzerinden paylaşılmıştır. Ayrı bir lisans veya yeniden dağıtım izni belirtilmemiştir; ham dosya GitHub'a yüklenmemiştir.
+- **Armut:** `armut_data.csv` ekipteki dosya olarak dersin Teams/SharePoint alanından alınmıştır. Dosyanın asıl yayımlayıcısı, kaynak sayfası ve lisans/yeniden dağıtım koşulları henüz doğrulanmamıştır. Bu nedenle ham dosya GitHub'a yüklenmemiştir. Özel Teams/SharePoint bağlantısı herkese açık depoya eklenmemelidir.
+
+Kaynakların asıl URL'si, erişim tarihi ve yeniden dağıtım koşulları ekip tarafından doğrulanınca bu kayıt güncellenmelidir. Bu bilgiler doğrulanana kadar analiz yalnızca anonim toplulaştırılmış çıktılarla paylaşılır.
+
+## Temizleme özeti
+
+Temizleme betiği her iki kaynakta tam yinelenen veya geçersiz kayıt bulmadı. Analiz 2024 takvim yılıyla sınırlandırıldı; kişisel/sipariş kimlikleri ve gerekli olmayan ayrıntı alanları çıktıdan çıkarıldı.
+
+| Kaynak | Girdi | 2024 kaydı | Temizleme çıktısı |
+|---|---:|---:|---:|
+| Armut | 162.523 satır (2018 ve 2024) | 65.732 hizmet kaydı | 1.970 gün-kategori toplam satırı; `UserId` ve `ServiceId` çıkarıldı |
+| NovaPerakende | 2.000 satır | 2.000 satış satırı | 366 günlük toplam; sipariş/müşteri kimlikleri ile konum, ürün ve maliyet ayrıntıları çıkarıldı |
+
+Bu sayılar `data/processed/cleaning_report.json` raporuyla aynıdır. Kaynakta satır bulunmayan günler sıfırla temsil edilmiştir; bu, o gün kesinlikle talep olmadığı anlamına gelmeyebilir.
 
 ## Seed alanları
 
