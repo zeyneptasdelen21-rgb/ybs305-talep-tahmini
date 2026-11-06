@@ -2,19 +2,27 @@ version: 2
 
 models:
   - name: mart_daily_demand
-    description: "Keşifsel günlük hizmet-satış talep görünümü; eşleşme yalnızca takvim gününe göredir."
+    description: "Keşifsel günlük hizmet-satış talep görünümü; Armut yalnızca kaynak kapsamındaki günlerde doludur."
     columns:
       - name: demand_date
         tests: [not_null, unique]
       - name: armut_service_requests
+        description: "Armut kaynağının kapsamı dışındaki tarihlerde NULL; kapsam içindeki talep yokluğu 0 olarak tutulur."
+      - name: armut_data_available
+        description: "Tarihin Armut kaynak verisinin kapsadığı dönemde olup olmadığını belirtir."
         tests: [not_null]
       - name: retail_units_sold
         tests: [not_null]
   - name: mart_monthly_demand
-    description: "Dashboard KPI'ları ve keşifsel dönemsel ilişki incelemesi için aylık toplamlar."
+    description: "Aylık dashboard KPI'ları; Armut toplamı yalnızca kaynak kapsamındaki günleri içerir."
     columns:
       - name: demand_month
         tests: [not_null, unique]
+      - name: armut_service_requests
+        description: "Ayda Armut kaynağı kapsamında en az bir gün varsa toplam; kapsam dışı aylarda NULL."
+      - name: armut_observed_days
+        description: "Ay içindeki Armut kaynak verisi bulunan gün sayısı."
+        tests: [not_null]
       - name: retail_units_sold
         tests: [not_null]
   - name: mart_retail_category_daily
