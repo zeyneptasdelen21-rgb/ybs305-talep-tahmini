@@ -48,6 +48,23 @@ def main() -> None:
         .rename(columns={"size": "service_requests"})
     )
     armut_rows_in_year = int(armut_daily["service_requests"].sum())
+    armut_source_date_start = str(armut["event_date"].min())
+    armut_source_date_end = str(armut["event_date"].max())
+    armut_observed_source_dates = int(armut["event_date"].nunique())
+    armut_category_ids = sorted(armut_daily["category_id"].unique(), key=int)
+    armut_calendar = pd.date_range(armut_source_date_start, armut_source_date_end, freq="D").strftime("%Y-%m-%d")
+    armut_complete_grid = pd.MultiIndex.from_product(
+        [armut_calendar, armut_category_ids],
+        names=["event_date", "category_id"],
+    ).to_frame(index=False)
+    armut_observed_groups = len(armut_daily)
+    armut_daily = armut_complete_grid.merge(
+        armut_daily,
+        on=["event_date", "category_id"],
+        how="left",
+    )
+    armut_daily["service_requests"] = armut_daily["service_requests"].fillna(0).astype("int64")
+    armut_missing_category_days_filled_zero = len(armut_daily) - armut_observed_groups
 
     # Retail: inspect missing values, remove exact duplicates, and validate values.
     retail = pd.read_excel(retail_source)
@@ -119,22 +136,6 @@ def main() -> None:
     retail_daily["gross_sales"] = retail_daily["gross_sales"].round(2)
     retail_daily["net_sales"] = retail_daily["net_sales"].round(2)
 
-    armut_days = set(armut_daily["event_date"])
-    missing_armut_days = [day for day in calendar if day not in armut_days]
-    if missing_armut_days:
-        armut_daily = pd.concat(
-            [
-                armut_daily,
-                pd.DataFrame(
-                    {
-                        "event_date": missing_armut_days,
-                        "category_id": ["unknown"] * len(missing_armut_days),
-                        "service_requests": [0] * len(missing_armut_days),
-                    }
-                ),
-            ],
-            ignore_index=True,
-        )
 
     write_csv(SEEDS / "armut_daily.csv", armut_daily[["event_date", "category_id", "service_requests"]])
     write_csv(SEEDS / "retail_daily.csv", retail_daily[["sale_date", "order_lines", "units_sold", "gross_sales", "net_sales"]])
@@ -150,6 +151,11 @@ def main() -> None:
                 "duplicate_rows_removed": armut_duplicate_rows,
                 "invalid_rows_removed": armut_invalid_rows,
                 "rows_in_2024": armut_rows_in_year,
+                "source_date_start": armut_source_date_start,
+                "source_date_end": armut_source_date_end,
+                "observed_source_dates": armut_observed_source_dates,
+                "category_ids": armut_category_ids,
+                "missing_category_date_pairs_filled_zero": armut_missing_category_days_filled_zero,
                 "output_aggregate_rows": len(armut_daily),
                 "identifier_columns_removed": ["UserId", "ServiceId"],
             },
@@ -169,7 +175,8 @@ def main() -> None:
         "notes": [
             "Outputs are aggregates; user/customer identifiers are excluded.",
             "A missing discount is treated as 0 (no recorded discount); rows missing other required values are excluded.",
-            "Days with no source rows are represented as zero; verify whether source coverage means true zero demand.",
+            "Armut dates outside the observed 2024 source coverage are not generated.",
+            "Within Armut source coverage, missing category-date pairs are zero-filled for category codes present in the source.",
             "Armut category_id values remain numeric source codes; no category-name mapping was supplied.",
         ],
     }
@@ -180,5 +187,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
 
