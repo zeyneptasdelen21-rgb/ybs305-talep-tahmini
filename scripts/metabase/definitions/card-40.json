@@ -1,0 +1,24 @@
+{
+  "original_id": 40,
+  "name": "2024 Aylık Net Satış Trendi",
+  "display": "line",
+  "dataset_query": {
+    "stages": [
+      {
+        "lib/type": "mbql.stage/mbql",
+        "source-table": 13
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "graph.dimensions": [
+      "demand_month"
+    ],
+    "graph.x_axis.scale": "timeseries",
+    "graph.metrics": [
+      "retail_net_sales"
+    ]
+  }
+}

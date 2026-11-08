@@ -1,0 +1,52 @@
+{
+  "original_id": 41,
+  "name": "2024 Kategori Bazında Net Satışlar",
+  "display": "bar",
+  "dataset_query": {
+    "stages": [
+      {
+        "source-table": 14,
+        "lib/type": "mbql.stage/mbql",
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "3a74a948-39be-4c0d-9cd8-926b08b801a5"
+            },
+            [
+              "field",
+              {
+                "lib/uuid": "d80ac7e3-c488-4733-a5c3-6dfe7d629f54",
+                "effective-type": "type/Decimal",
+                "base-type": "type/Decimal"
+              },
+              105
+            ]
+          ]
+        ],
+        "breakout": [
+          [
+            "field",
+            {
+              "effective-type": "type/Text",
+              "lib/uuid": "21b4391e-b511-4a95-a6c3-5fe5fb21e724",
+              "base-type": "type/Text"
+            },
+            102
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "graph.x_axis.scale": "ordinal",
+    "graph.dimensions": [
+      "category"
+    ],
+    "graph.metrics": [
+      "sum"
+    ]
+  }
+}

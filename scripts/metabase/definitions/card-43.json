@@ -1,0 +1,35 @@
+{
+  "original_id": 43,
+  "name": "2024 Toplam Net Satış (TL)",
+  "display": "scalar",
+  "dataset_query": {
+    "stages": [
+      {
+        "source-table": 13,
+        "lib/type": "mbql.stage/mbql",
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "75fa3b54-fcda-4d74-88e6-8549c673e9ac"
+            },
+            [
+              "field",
+              {
+                "effective-type": "type/Decimal",
+                "lib/uuid": "33e238d8-ff08-4f39-94b0-de43ccf22c33",
+                "base-type": "type/Decimal"
+              },
+              99
+            ]
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "scalar.segments": []
+  }
+}

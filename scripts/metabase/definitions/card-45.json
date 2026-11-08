@@ -1,0 +1,35 @@
+{
+  "original_id": 45,
+  "name": "2024 Toplam Satılan Ürün Adedi",
+  "display": "scalar",
+  "dataset_query": {
+    "stages": [
+      {
+        "source-table": 13,
+        "lib/type": "mbql.stage/mbql",
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "ac6a3a21-1c6e-4bd4-831a-92d7e48081cb"
+            },
+            [
+              "field",
+              {
+                "effective-type": "type/Integer",
+                "lib/uuid": "b4b3acdd-36fe-4aa4-b0b8-c0803c418656",
+                "base-type": "type/Integer"
+              },
+              97
+            ]
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "scalar.segments": []
+  }
+}

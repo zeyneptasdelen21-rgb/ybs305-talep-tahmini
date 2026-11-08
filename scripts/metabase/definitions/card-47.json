@@ -1,0 +1,73 @@
+{
+  "original_id": 47,
+  "name": "2024 Aylık Kategori Bazında Net Satış Analizi",
+  "display": "pivot",
+  "dataset_query": {
+    "stages": [
+      {
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "64c3f7d8-4ea4-4dea-8833-c1fb0c1409f5"
+            },
+            [
+              "field",
+              {
+                "effective-type": "type/Decimal",
+                "lib/uuid": "7a30fe94-6e21-4c99-af51-00cd5c1ffd57",
+                "base-type": "type/Decimal"
+              },
+              105
+            ]
+          ]
+        ],
+        "source-table": 14,
+        "lib/type": "mbql.stage/mbql",
+        "breakout": [
+          [
+            "field",
+            {
+              "lib/uuid": "d81c1d30-e24c-4c8e-aeb0-a588f9f609c3",
+              "effective-type": "type/Text",
+              "base-type": "type/Text"
+            },
+            102
+          ],
+          [
+            "field",
+            {
+              "lib/uuid": "bd895f8e-3875-445f-aae6-cb4c4d998509",
+              "effective-type": "type/Date",
+              "base-type": "type/Date",
+              "temporal-unit": "month"
+            },
+            101
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "pivot_table.column_split": {
+      "rows": [
+        "sale_date"
+      ],
+      "columns": [
+        "category"
+      ],
+      "values": [
+        "sum"
+      ]
+    },
+    "pivot_table.column_widths": {
+      "leftHeaderWidths": [
+        111
+      ],
+      "totalLeftHeaderWidths": 111,
+      "valueHeaderWidths": {}
+    }
+  }
+}

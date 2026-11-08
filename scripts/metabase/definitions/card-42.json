@@ -1,0 +1,53 @@
+{
+  "original_id": 42,
+  "name": "2024 Aylık Armut Hizmet Talebi Trendi",
+  "display": "line",
+  "dataset_query": {
+    "stages": [
+      {
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "e8c870fc-3c53-410f-8715-4f15c2914ed8"
+            },
+            [
+              "field",
+              {
+                "effective-type": "type/Integer",
+                "lib/uuid": "c0173ada-df2f-4ccd-86d2-12c50a37077b",
+                "base-type": "type/Integer"
+              },
+              94
+            ]
+          ]
+        ],
+        "source-table": 13,
+        "lib/type": "mbql.stage/mbql",
+        "breakout": [
+          [
+            "field",
+            {
+              "effective-type": "type/Date",
+              "base-type": "type/Date",
+              "lib/uuid": "e79a08f4-ed35-44d2-b16f-37d11c175296",
+              "temporal-unit": "month"
+            },
+            93
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "graph.x_axis.scale": "timeseries",
+    "graph.dimensions": [
+      "demand_month"
+    ],
+    "graph.metrics": [
+      "sum"
+    ]
+  }
+}

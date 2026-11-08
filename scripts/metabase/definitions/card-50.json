@@ -1,0 +1,35 @@
+{
+  "original_id": 50,
+  "name": "2024 Toplam Sipariş Satırı Sayısı",
+  "display": "scalar",
+  "dataset_query": {
+    "stages": [
+      {
+        "source-table": 13,
+        "lib/type": "mbql.stage/mbql",
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "91f3ef3f-c44b-40eb-a07c-8cdcf78b81f0"
+            },
+            [
+              "field",
+              {
+                "effective-type": "type/Integer",
+                "lib/uuid": "cc8a8468-0f3d-4bac-8ad7-49b6065580a1",
+                "base-type": "type/Integer"
+              },
+              96
+            ]
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "scalar.segments": []
+  }
+}

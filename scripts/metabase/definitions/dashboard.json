@@ -1,0 +1,376 @@
+{
+  "name": "YBS305 - Talep Tahmini ve Satış Analizi",
+  "description": null,
+  "parameters": [
+    {
+      "name": "Tarih Aralığı",
+      "type": "date/all-options",
+      "sectionId": "date",
+      "slug": "tarih_aral%C4%B1%C4%9F%C4%B1",
+      "id": "e6d22fae"
+    },
+    {
+      "name": "Kategori",
+      "type": "string/=",
+      "sectionId": "string",
+      "slug": "kategori",
+      "id": "69e48c1c"
+    }
+  ],
+  "dashcards": [
+    {
+      "original_card_id": 40,
+      "row": 0,
+      "col": 0,
+      "size_x": 12,
+      "size_y": 6,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 40,
+          "target": [
+            "dimension",
+            [
+              "field",
+              93,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 41,
+      "row": 0,
+      "col": 12,
+      "size_x": 12,
+      "size_y": 6,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 41,
+          "target": [
+            "dimension",
+            [
+              "field",
+              101,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        },
+        {
+          "parameter_id": "69e48c1c",
+          "card_id": 41,
+          "target": [
+            "dimension",
+            [
+              "field",
+              102,
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 42,
+      "row": 6,
+      "col": 0,
+      "size_x": 12,
+      "size_y": 6,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 42,
+          "target": [
+            "dimension",
+            [
+              "field",
+              93,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 43,
+      "row": 6,
+      "col": 12,
+      "size_x": 6,
+      "size_y": 3,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 43,
+          "target": [
+            "dimension",
+            [
+              "field",
+              93,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 44,
+      "row": 6,
+      "col": 18,
+      "size_x": 6,
+      "size_y": 3,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 44,
+          "target": [
+            "dimension",
+            [
+              "field",
+              93,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 45,
+      "row": 9,
+      "col": 12,
+      "size_x": 6,
+      "size_y": 3,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 45,
+          "target": [
+            "dimension",
+            [
+              "field",
+              93,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 46,
+      "row": 12,
+      "col": 0,
+      "size_x": 12,
+      "size_y": 9,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 46,
+          "target": [
+            "dimension",
+            [
+              "field",
+              93,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 47,
+      "row": 12,
+      "col": 12,
+      "size_x": 12,
+      "size_y": 9,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 47,
+          "target": [
+            "dimension",
+            [
+              "field",
+              101,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        },
+        {
+          "parameter_id": "69e48c1c",
+          "card_id": 47,
+          "target": [
+            "dimension",
+            [
+              "field",
+              102,
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 48,
+      "row": 21,
+      "col": 0,
+      "size_x": 12,
+      "size_y": 8,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 48,
+          "target": [
+            "dimension",
+            [
+              "field",
+              101,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        },
+        {
+          "parameter_id": "69e48c1c",
+          "card_id": 48,
+          "target": [
+            "dimension",
+            [
+              "field",
+              102,
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 49,
+      "row": 21,
+      "col": 12,
+      "size_x": 12,
+      "size_y": 6,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 49,
+          "target": [
+            "dimension",
+            [
+              "field",
+              101,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        },
+        {
+          "parameter_id": "69e48c1c",
+          "card_id": 49,
+          "target": [
+            "dimension",
+            [
+              "field",
+              102,
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "original_card_id": 50,
+      "row": 9,
+      "col": 18,
+      "size_x": 6,
+      "size_y": 3,
+      "parameter_mappings": [
+        {
+          "parameter_id": "e6d22fae",
+          "card_id": 50,
+          "target": [
+            "dimension",
+            [
+              "field",
+              93,
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            {
+              "stage-number": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

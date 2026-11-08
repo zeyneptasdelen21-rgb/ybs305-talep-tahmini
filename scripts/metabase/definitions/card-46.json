@@ -1,0 +1,71 @@
+{
+  "original_id": 46,
+  "name": "2024 Aylık Satış ve Hizmet Talebi Özeti",
+  "display": "table",
+  "dataset_query": {
+    "stages": [
+      {
+        "lib/type": "mbql.stage/mbql",
+        "source-table": 13,
+        "order-by": [
+          [
+            "asc",
+            {
+              "lib/uuid": "4ed87c61-74e2-48db-8b74-caf4bfe6d672"
+            },
+            [
+              "field",
+              {
+                "lib/uuid": "8bc4e6af-2200-4260-997f-8d2207ab6ffa",
+                "effective-type": "type/Date",
+                "base-type": "type/Date"
+              },
+              93
+            ]
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "table.columns": [
+      {
+        "name": "demand_month",
+        "enabled": true
+      },
+      {
+        "name": "armut_service_requests",
+        "enabled": true
+      },
+      {
+        "name": "armut_observed_days",
+        "enabled": false
+      },
+      {
+        "name": "retail_order_lines",
+        "enabled": true
+      },
+      {
+        "name": "retail_units_sold",
+        "enabled": true
+      },
+      {
+        "name": "retail_gross_sales",
+        "enabled": false
+      },
+      {
+        "name": "retail_net_sales",
+        "enabled": true
+      },
+      {
+        "name": "calendar_days",
+        "enabled": false
+      }
+    ],
+    "table.pivot": false,
+    "table.pivot_column": "calendar_days",
+    "table.cell_column": "armut_service_requests"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "original_id": 48,
+  "name": "2024 Kategori Bazında Net Satış Dağılımı (%)",
+  "display": "pie",
+  "dataset_query": {
+    "stages": [
+      {
+        "source-table": 14,
+        "lib/type": "mbql.stage/mbql",
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "f8cd1371-a3b5-4daa-bcef-e277ec1cc9c4"
+            },
+            [
+              "field",
+              {
+                "lib/uuid": "6c7b9aa3-3f88-4509-b821-e208c4595176",
+                "effective-type": "type/Decimal",
+                "base-type": "type/Decimal"
+              },
+              105
+            ]
+          ]
+        ],
+        "breakout": [
+          [
+            "field",
+            {
+              "effective-type": "type/Text",
+              "lib/uuid": "01eec451-14f6-4642-97bd-000c41179b97",
+              "base-type": "type/Text"
+            },
+            102
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "pie.metric": "sum",
+    "pie.dimension": [
+      "category"
+    ]
+  }
+}

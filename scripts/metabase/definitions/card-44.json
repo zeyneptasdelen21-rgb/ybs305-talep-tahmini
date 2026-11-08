@@ -1,0 +1,35 @@
+{
+  "original_id": 44,
+  "name": "2024 Toplam Armut Hizmet Talebi",
+  "display": "scalar",
+  "dataset_query": {
+    "stages": [
+      {
+        "source-table": 13,
+        "lib/type": "mbql.stage/mbql",
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "fbe0c006-3ea1-483a-b603-30df5112d29c"
+            },
+            [
+              "field",
+              {
+                "effective-type": "type/Integer",
+                "lib/uuid": "9beea1fb-4b3d-4e3c-81c9-4d92aba08751",
+                "base-type": "type/Integer"
+              },
+              94
+            ]
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "scalar.segments": []
+  }
+}

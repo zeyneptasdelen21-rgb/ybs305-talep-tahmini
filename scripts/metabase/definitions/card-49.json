@@ -1,0 +1,68 @@
+{
+  "original_id": 49,
+  "name": "2024 Kategori Bazında Satılan Ürün Adetleri",
+  "display": "row",
+  "dataset_query": {
+    "stages": [
+      {
+        "aggregation": [
+          [
+            "sum",
+            {
+              "lib/uuid": "0d5e925f-a35c-4cfd-8961-c1bb36e4f6ec",
+              "effective-type": "type/Integer"
+            },
+            [
+              "field",
+              {
+                "effective-type": "type/Integer",
+                "lib/uuid": "dbe5cff1-9c22-4e50-8440-1dbe4deb7f30",
+                "base-type": "type/Integer"
+              },
+              104
+            ]
+          ]
+        ],
+        "lib/type": "mbql.stage/mbql",
+        "source-table": 14,
+        "breakout": [
+          [
+            "field",
+            {
+              "lib/uuid": "5b8e6869-47ca-409b-9dec-c9d3513a75c1",
+              "effective-type": "type/Text",
+              "base-type": "type/Text"
+            },
+            102
+          ]
+        ]
+      }
+    ],
+    "lib/type": "mbql/query",
+    "database": 2
+  },
+  "visualization_settings": {
+    "pivot_table.column_split": {
+      "rows": [
+        "category"
+      ],
+      "columns": [],
+      "values": [
+        "sum"
+      ]
+    },
+    "pivot_table.column_widths": {
+      "leftHeaderWidths": [
+        90
+      ],
+      "totalLeftHeaderWidths": 90,
+      "valueHeaderWidths": {}
+    },
+    "graph.dimensions": [
+      "category"
+    ],
+    "graph.metrics": [
+      "sum"
+    ]
+  }
+}
