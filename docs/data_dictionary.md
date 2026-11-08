@@ -57,3 +57,73 @@ Gün, kategori, `order_lines`, `units_sold` ve `net_sales` alanları. Armut kate
 - `order_lines` kaynak satır sayısıdır, sipariş kimlikleri temizleme öncesinde tekil olsa dahi birden çok satırın aynı siparişe ait olup olmadığı semantik olarak doğrulanmamıştır.
 - Günlük gözlemler bağımsız değildir. İstatistiksel karşılaştırmada mevsimsellik, haftanın günü, trend ve otokorelasyon dikkate alınmalıdır.
 - Veri hacmi ve kapsamı nedeniyle sonuçlar keşifsel/prototip olarak raporlanır.
+
+## dbt Mart Modelleri Veri Sözlüğü
+
+Bu bölümde, PostgreSQL veri ambarındaki `analytics` şemasında bulunan ve Metabase dashboard ile analiz çalışmalarında kullanılan üç mart modelinin alanları açıklanmaktadır.
+
+Sütun adları ve veri türleri PostgreSQL `information_schema.columns` üzerinden doğrulanmıştır.
+
+### 1. mart_daily_demand — Günlük Talep ve Satış Analizi
+
+Armut hizmet talepleri ile NovaPerakende satış verilerinin günlük düzeyde birlikte incelenmesi için hazırlanmış analiz tablosudur.
+
+| Sütun adı | Veri türü | Açıklama |
+|---|---|---|
+| demand_date | date | Analizin gerçekleştirildiği takvim günü |
+| demand_month | date | İlgili günün ait olduğu ayı temsil eden tarih |
+| day_of_week | integer | Haftanın gününü belirten sayısal değer |
+| armut_service_requests | integer | İlgili gündeki Armut hizmet talebi sayısı |
+| armut_data_available | boolean | İlgili gün için Armut kaynak verisinin bulunup bulunmadığını gösteren alan |
+| retail_order_lines | integer | İlgili gündeki perakende satış satırı sayısı |
+| retail_units_sold | integer | İlgili günde satılan toplam ürün adedi |
+| retail_gross_sales | numeric | İndirim uygulanmadan önceki toplam satış tutarı |
+| retail_net_sales | numeric | İndirimler sonrasındaki toplam net satış tutarı |
+
+Bu tablo, günlük satış ve hizmet talebi eğilimlerinin incelenmesinde kullanılmaktadır.
+
+### 2. mart_monthly_demand — Aylık Talep ve Satış Analizi
+
+Günlük verilerin aylık düzeyde özetlenmesiyle oluşturulan analiz tablosudur. Aylık satış trendleri, hizmet talebi değişimleri ve temel performans göstergelerinin incelenmesinde kullanılmaktadır.
+
+| Sütun adı | Veri türü | Açıklama |
+|---|---|---|
+| demand_month | date | Analizin ait olduğu ayı temsil eden tarih |
+| armut_service_requests | integer | İlgili ayda kaydedilen toplam Armut hizmet talebi |
+| armut_observed_days | integer | İlgili ayda Armut verisinin mevcut olduğu gün sayısı |
+| retail_order_lines | integer | İlgili aydaki toplam perakende satış satırı sayısı |
+| retail_units_sold | integer | İlgili ayda satılan toplam ürün adedi |
+| retail_gross_sales | numeric | İlgili ayın indirim öncesi toplam satış tutarı |
+| retail_net_sales | numeric | İlgili ayın indirim sonrası toplam net satış tutarı |
+| calendar_days | integer | İlgili takvim ayındaki toplam gün sayısı |
+
+Bu tablo, Metabase dashboard üzerinde aylık net satış ve Armut hizmet talebi trendleri ile toplam satış, ürün adedi ve satış satırı KPI'larının hesaplanmasında kullanılmaktadır.
+
+### 3. mart_retail_category_daily — Günlük Kategori Bazında Satış Analizi
+
+NovaPerakende satışlarının ürün kategorilerine göre günlük düzeyde incelenmesi için hazırlanmış analiz tablosudur.
+
+| Sütun adı | Veri türü | Açıklama |
+|---|---|---|
+| sale_date | date | Satışın gerçekleştiği takvim günü |
+| category | character varying | Ürünün ait olduğu perakende kategorisi |
+| order_lines | integer | İlgili gün ve kategorideki satış satırı sayısı |
+| units_sold | integer | İlgili gün ve kategoride satılan toplam ürün adedi |
+| net_sales | numeric | İlgili gün ve kategoride gerçekleşen indirim sonrası net satış tutarı |
+
+Bu tablo, Metabase dashboard üzerinde kategori bazında net satışların, kategori satış paylarının ve satılan ürün adetlerinin görselleştirilmesinde kullanılmaktadır.
+
+### 4. Veri Türleri ve Yorumlama Notları
+
+- `date`: Takvim tarihini ifade eder.
+- `integer`: Tam sayı türündeki değerleri ifade eder.
+- `numeric`: Satış tutarları gibi sayısal değerleri ifade eder.
+- `boolean`: Doğru veya yanlış değerlerini ifade eder.
+- `character varying`: Metin türündeki değerleri ifade eder.
+
+**Önemli analitik notlar:**
+
+- `order_lines` alanı satış satırı sayısını gösterir; doğrudan benzersiz sipariş sayısı olarak yorumlanmamalıdır.
+- `gross_sales` indirim öncesi, `net_sales` ise indirim sonrası satış tutarını ifade eder.
+- Armut hizmet kategorileri ile perakende ürün kategorileri arasında doğrudan eşleştirme yapılmamıştır.
+- Kaynakta kayıt bulunm
