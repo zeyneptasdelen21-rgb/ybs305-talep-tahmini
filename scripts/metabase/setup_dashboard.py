@@ -7,6 +7,20 @@ from pathlib import Path
 
 import requests
 
+
+def auth_headers(api_key=None):
+    session_id = os.environ.get("METABASE_SESSION_ID", "").strip()
+
+    if session_id:
+        return {"X-Metabase-Session": session_id}
+
+    if api_key:
+        return {"X-API-Key": api_key}
+
+    raise RuntimeError(
+        "Metabase oturumu veya API anahtari tanimli degil."
+    )
+
 ROOT = Path(__file__).resolve().parents[2]
 DEFINITIONS = ROOT / "scripts" / "metabase" / "definitions"
 
@@ -31,7 +45,7 @@ OLD_FIELDS = {
 def api_get(path, api_key):
     response = requests.get(
         BASE_URL + path,
-        headers={"X-API-Key": api_key},
+        headers=auth_headers(api_key),
         timeout=30,
     )
     response.raise_for_status()
@@ -158,7 +172,7 @@ def load_definitions():
 def api_post(path, api_key, payload):
     response = requests.post(
         BASE_URL + path,
-        headers={"X-API-Key": api_key},
+        headers=auth_headers(api_key),
         json=payload,
         timeout=30,
     )
@@ -305,6 +319,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
