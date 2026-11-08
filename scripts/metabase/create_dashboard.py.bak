@@ -1,0 +1,301 @@
+
+import os
+import copy
+import requests
+
+from setup_dashboard import (
+    BASE_URL,
+    api_get,
+    api_post,
+    find_database,
+    find_tables,
+    find_fields,
+    remap_ids,
+    load_definitions,
+    create_all_cards,
+)
+
+
+DASHBOARD_NAME = "YBS305 AUTO - Talep Tahmini ve Satis Analizi"
+
+
+def get_api_key():
+    api_key = os.environ.get("METABASE_API_KEY", "").strip()
+
+    if not api_key:
+        raise RuntimeError(
+            "METABASE_API_KEY tanimli degil. "
+            "Once PowerShell'de API anahtarini tanimla."
+        )
+
+    return api_key
+
+
+def get_existing_dashboard(api_key):
+    result = api_get("/api/dashboard", api_key)
+
+    if isinstance(result, dict):
+        dashboards = result.get("data", [])
+    else:
+        dashboards = result
+
+    matches = [
+        dashboard
+        for dashboard in dashboards
+        if dashboard.get("name") == DASHBOARD_NAME
+    ]
+
+    if len(matches) > 1:
+        raise RuntimeError(
+            "Ayni isimde birden fazla dashboard bulundu."
+        )
+
+    return matches[0] if matches else None
+
+
+def create_or_find_dashboard(api_key, dashboard_def):
+    existing = get_existing_dashboard(api_key)
+
+    if existing:
+        dashboard_id = existing["id"]
+        print(f"Mevcut dashboard bulundu: {dashboard_id}")
+        return dashboard_id
+
+    payload = {
+        "name": DASHBOARD_NAME,
+        "description": "YBS305 otomatik dashboard kurulumu",
+        "parameters": copy.deepcopy(
+            dashboard_def.get("parameters", [])
+        ),
+    }
+
+    created = api_post("/api/dashboard", api_key, payload)
+
+    dashboard_id = created["id"]
+
+    print(f"Yeni dashboard olusturuldu: {dashboard_id}")
+
+    return dashboard_id
+
+
+def prepare_dashcards(
+    dashboard_def,
+    card_map,
+    table_map,
+    field_map,
+    existing_dashcards,
+):
+    existing_ids = {
+        item["card_id"]: item["id"]
+        for item in existing_dashcards
+        if item.get("card_id") is not None
+    }
+
+    dashcards = []
+
+    for index, item in enumerate(
+        dashboard_def.get("dashcards", [])
+    ):
+        old_card_id = int(item["original_card_id"])
+
+        if old_card_id not in card_map:
+            raise RuntimeError(
+                f"Kart eslestirmesi bulunamadi: {old_card_id}"
+            )
+
+        new_card_id = card_map[old_card_id]
+
+        mappings = remap_ids(
+            copy.deepcopy(
+                item.get("parameter_mappings", [])
+            ),
+            table_map,
+            field_map,
+        )
+
+        for mapping in mappings:
+            mapping["card_id"] = new_card_id
+
+        dashcard = {
+            "id": existing_ids.get(
+                new_card_id,
+                -(index + 1)
+            ),
+            "card_id": new_card_id,
+            "row": item["row"],
+            "col": item["col"],
+            "size_x": item["size_x"],
+            "size_y": item["size_y"],
+            "parameter_mappings": mappings,
+            "visualization_settings": {},
+            "dashboard_tab_id": None,
+            "series": [],
+        }
+
+        dashcards.append(dashcard)
+
+    return dashcards
+
+
+def update_dashboard(
+    api_key,
+    dashboard_id,
+    dashboard_def,
+    dashcards,
+):
+    payload = {
+        "dashcards": dashcards,
+        "parameters": copy.deepcopy(
+            dashboard_def.get("parameters", [])
+        ),
+    }
+
+    response = requests.put(
+        f"{BASE_URL}/api/dashboard/{dashboard_id}",
+        headers={
+            "X-API-Key": api_key,
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=60,
+    )
+
+    if not response.ok:
+        raise RuntimeError(
+            f"Dashboard guncellenemedi.\n"
+            f"HTTP: {response.status_code}\n"
+            f"Yanit: {response.text[:1500]}"
+        )
+
+    return response.json()
+
+
+def verify_dashboard(api_key, dashboard_id):
+    dashboard = api_get(
+        f"/api/dashboard/{dashboard_id}",
+        api_key,
+    )
+
+    dashcards = dashboard.get("dashcards", [])
+    parameters = dashboard.get("parameters", [])
+
+    mapping_count = sum(
+        len(card.get("parameter_mappings", []))
+        for card in dashcards
+    )
+
+    print("\n" + "=" * 50)
+    print("YBS305 DASHBOARD KONTROLU")
+    print("=" * 50)
+
+    print(f"Dashboard ID: {dashboard_id}")
+    print(f"Kart sayisi: {len(dashcards)}")
+    print(f"Filtre sayisi: {len(parameters)}")
+    print(f"Filtre baglantisi sayisi: {mapping_count}")
+
+    print("\nFiltreler:")
+
+    for parameter in parameters:
+        print(
+            f" - {parameter.get('name', 'Isimsiz')}"
+        )
+
+    print("\nDashboard adresi:")
+    print(f"{BASE_URL}/dashboard/{dashboard_id}")
+
+    if len(dashcards) != 11:
+        print("\nUYARI: Beklenen kart sayisi 11.")
+
+    if len(parameters) != 2:
+        print("UYARI: Beklenen filtre sayisi 2.")
+
+    if mapping_count != 15:
+        print("UYARI: Beklenen filtre baglantisi sayisi 15.")
+
+    if (
+        len(dashcards) == 11
+        and len(parameters) == 2
+        and mapping_count == 15
+    ):
+        print("\nDashboard yapisi basariyla dogrulandi!")
+
+    print("=" * 50)
+
+
+def main():
+    print("YBS305 Dashboard kurulumu basliyor...\n")
+
+    api_key = get_api_key()
+
+    dashboard_def, cards = load_definitions()
+
+    print(f"Yuklenen kart tanimi: {len(cards)}")
+
+    # find_database fonksiyonu dogrudan sayisal ID dondurur.
+    database_id = find_database(api_key)
+
+    print(f"Veritabani ID: {database_id}")
+
+    table_map = find_tables(
+        api_key,
+        database_id,
+    )
+
+    field_map = find_fields(
+        api_key,
+        table_map,
+    )
+
+    print("Tablo ve alan eslestirmeleri hazir.")
+
+    # Daha once olusturulan kartlari yeniden kullan.
+    card_map = create_all_cards(
+        api_key,
+        cards,
+        database_id,
+        table_map,
+        field_map,
+    )
+
+    print(f"Eslesen kart sayisi: {len(card_map)}")
+
+    dashboard_id = create_or_find_dashboard(
+        api_key,
+        dashboard_def,
+    )
+
+    current_dashboard = api_get(
+        f"/api/dashboard/{dashboard_id}",
+        api_key,
+    )
+
+    dashcards = prepare_dashcards(
+        dashboard_def,
+        card_map,
+        table_map,
+        field_map,
+        current_dashboard.get("dashcards", []),
+    )
+
+    print(
+        f"Dashboard'a yerlestirilecek kart: "
+        f"{len(dashcards)}"
+    )
+
+    update_dashboard(
+        api_key,
+        dashboard_id,
+        dashboard_def,
+        dashcards,
+    )
+
+    print("Dashboard guncelleme istegi tamamlandi.")
+
+    verify_dashboard(
+        api_key,
+        dashboard_id,
+    )
+
+
+if __name__ == "__main__":
+    main()
