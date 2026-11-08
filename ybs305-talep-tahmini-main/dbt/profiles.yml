@@ -1,0 +1,12 @@
+complementary_demand:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'localhost') }}"
+      user: "{{ env_var('DBT_USER', 'analyst') }}"
+      password: "{{ env_var('DBT_PASSWORD', 'local_dev_only') }}"
+      port: 5432
+      dbname: "{{ env_var('DBT_DB', 'retail_analytics') }}"
+      schema: "{{ env_var('DBT_SCHEMA', 'analytics') }}"
+      threads: 4

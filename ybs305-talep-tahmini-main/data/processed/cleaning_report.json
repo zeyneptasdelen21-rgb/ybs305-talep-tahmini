@@ -1,0 +1,38 @@
+{
+  "scope": "calendar year 2024",
+  "sources": {
+    "armut": {
+      "input_rows": 162523,
+      "duplicate_rows_removed": 0,
+      "invalid_rows_removed": 0,
+      "rows_in_2024": 65732,
+      "output_aggregate_rows": 1970,
+      "identifier_columns_removed": [
+        "UserId",
+        "ServiceId"
+      ]
+    },
+    "retail": {
+      "input_rows": 2000,
+      "duplicate_rows_removed": 0,
+      "invalid_rows_removed": 0,
+      "rows_in_2024": 2000,
+      "output_daily_rows": 366,
+      "identifier_columns_removed": [
+        "SiparisID",
+        "Musteri_ID",
+        "Sehir",
+        "Bolge",
+        "Kanal",
+        "Urun",
+        "BirimFiyat",
+        "Maliyet"
+      ]
+    }
+  },
+  "notes": [
+    "Outputs are aggregates; user/customer identifiers are excluded.",
+    "Days with no source rows are represented as zero; verify whether source coverage means true zero demand.",
+    "Armut category_id values remain numeric source codes; no category-name mapping was supplied."
+  ]
+}

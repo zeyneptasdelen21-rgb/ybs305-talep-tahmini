@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_armut_daily
+    description: "2024 Armut hizmet kayıtlarının anonim tarih ve kategori kodu bazında toplamı."
+    columns:
+      - name: event_date
+        tests: [not_null]
+      - name: category_id
+        tests: [not_null]
+      - name: service_requests
+        tests: [not_null]
+  - name: stg_retail_daily
+    description: "2024 perakende satışlarının anonim günlük toplamı."
+    columns:
+      - name: sale_date
+        tests: [not_null, unique]
+      - name: units_sold
+        tests: [not_null]
+      - name: net_sales
+        tests: [not_null]
+  - name: stg_retail_category_daily
+    description: "Gün ve ürün kategorisi bazında perakende satış toplamları."
+    columns:
+      - name: sale_date
+        tests: [not_null]
+      - name: category
+        tests: [not_null]
