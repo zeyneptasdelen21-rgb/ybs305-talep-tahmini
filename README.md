@@ -189,7 +189,7 @@ Bu sonuçlar, projenin veri işleme ve görselleştirme bileşenlerinin yerel or
 ## Ekip çalışması
 Aidana Almas — Veri hazırlama.
 Rümeysa Kocatürk ve Zeynep Taşdelen — dbt dönüşümleri ve veri kontrolleri.
-Mercan Taşıtlarla ve Helin Oğur — Dashboard çalışmaları.
+Mercan Taşlıtlarla ve Helin Oğur — Dashboard çalışmaları.
 
 
 
