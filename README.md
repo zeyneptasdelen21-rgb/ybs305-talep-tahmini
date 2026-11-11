@@ -187,12 +187,10 @@ Projenin yerel geliştirme ortamında yapılan kontroller sonucunda:
 Bu sonuçlar, projenin veri işleme ve görselleştirme bileşenlerinin yerel ortamda başarıyla çalıştığını göstermektedir.
 
 ## Ekip çalışması
+Aidana Almas — Veri hazırlama.
+Rümeysa Kocatürk ve Zeynep Taşdelen — dbt dönüşümleri ve veri kontrolleri.
+Mercan Taşıtlarla ve Helin Oğur — Dashboard çalışmaları.
 
-Aidana Almas — Problem tanımı ve veriyi hazırlama.s
-Zeynep Taşdelen — dbt dönüşümleri ve veri kontrolleri.
-Rümeysa Kocatürk — Dashboard.
-Mercan Taşlıtarla — İlişki analizi ve bulgular.
-Helin Oğur — Kurulum, GitHub ve ortak dokümantasyon.
 
 
 
