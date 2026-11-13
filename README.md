@@ -124,6 +124,12 @@ Projenin analiz ve görselleştirme işlemleri Metabase kullanılarak gerçekle�
 
 Metabase erişim adresi: http://localhost:3000
 
+**Herkese Açık Dashboard (Geçici Erişim):**
+
+https://boys-festivals-forecasts-purse.trycloudflare.com/public/dashboard/a779a739-f4c4-4165-bdf3-e04a1095b0b6
+
+**Not:** Dashboard, Cloudflare Quick Tunnel aracılığıyla geçici olarak paylaşılmaktadır. Bağlantının çalışması için yerel bilgisayarın, Docker servislerinin ve Cloudflare Tunnel işleminin açık olması gerekir. Tünel yeniden başlatıldığında bağlantı adresi değişebilir.
+
 **Dashboard adı:** YBS305 - Talep Tahmini ve Satış Analizi
 
 Dashboard üzerinde 2024 yılına ait Armut hizmet talepleri ve NovaPerakende satış verileri analiz edilmektedir.
